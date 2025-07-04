@@ -147,3 +147,7 @@ yarn-error.log*
 *.zip
 *.rar
 *.7z
+
+
+# Copilot files
+docs/copilot/
