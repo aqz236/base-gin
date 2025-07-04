@@ -5,6 +5,8 @@ import (
 	"base-gin/internal/infrastructure/database/models"
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -43,16 +45,24 @@ func (db *DB) initGORM() error {
 	// 根据配置选择数据库驱动
 	switch db.getDatabaseType() {
 	case "sqlite":
-		// 使用SQLite
-		dialector = sqlite.Open("data/app.db")
+		// 使用SQLite - 确保数据目录存在
+		dbPath := "data/app.db"
+		if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
+			return fmt.Errorf("failed to create database directory: %v", err)
+		}
+		dialector = sqlite.Open(dbPath)
 	case "postgres":
 		// 使用PostgreSQL
 		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai",
 			db.config.Host, db.config.Port, db.config.Username, db.config.Password, db.config.Database)
 		dialector = postgres.Open(dsn)
 	default:
-		// 默认使用SQLite
-		dialector = sqlite.Open("data/app.db")
+		// 默认使用SQLite - 确保数据目录存在
+		dbPath := "data/app.db"
+		if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
+			return fmt.Errorf("failed to create database directory: %v", err)
+		}
+		dialector = sqlite.Open(dbPath)
 	}
 
 	// 配置GORM
