@@ -105,6 +105,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
           
+    - name: 安装系统依赖 (Linux)
+      if: matrix.goos == 'linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc libc6-dev
+          
     - name: 安装依赖
       run: |
         go mod download
@@ -124,7 +130,7 @@ jobs:
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
-        CGO_ENABLED: 0
+        CGO_ENABLED: ${{ matrix.goos == 'linux' && '1' || '0' }}
       shell: bash
       run: |
         go build -ldflags="-s -w -X main.version=${{ github.sha }}" \
