@@ -26,9 +26,9 @@ import (
 func InitializeApp() (*App, func(), error) {
 	config := configs.LoadConfig()
 	db := database.NewDB(config)
-	userRepo := user_impl.NewUserRepository(db)
-	userDomainService := service.NewUserDomainService(userRepo)
-	userService := service2.NewUserService(userRepo, userDomainService)
+	gormUserRepository := user_impl.NewGormUserRepository(db)
+	userDomainService := service.NewUserDomainService(gormUserRepository)
+	userService := service2.NewUserService(gormUserRepository, userDomainService)
 	validator := validation.NewValidator()
 	userHandler := user.NewUserHandler(userService, validator)
 	engine := router.NewRouter(userHandler)

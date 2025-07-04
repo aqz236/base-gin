@@ -1,0 +1,164 @@
+# 用户管理 - 基础CRUD操作
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}
+@apiBase = {{baseUrl}}/api/v1
+@jsonContentType = application/json
+
+# 测试数据
+@testUserName = 张三
+@testUserEmail = zhangsan@example.com
+@testUserPassword = password123
+
+### 1. 获取所有用户列表
+GET {{apiBase}}/users
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("获取用户列表", function() {
+    client.assert(response.status === 200, "应该返回200状态码");
+    client.assert(response.body.data !== undefined, "应该有data字段");
+    client.assert(Array.isArray(response.body.data), "data应该是数组");
+    console.log("当前用户数量: " + response.body.data.length);
+  });
+%}
+
+###
+
+### 2. 创建新用户
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "{{testUserName}}",
+  "email": "{{testUserEmail}}",
+  "password": "{{testUserPassword}}"
+}
+
+> {%
+  client.test("创建用户", function() {
+    client.assert(response.status === 201, "创建成功应该返回201状态码");
+    client.assert(response.body.data !== undefined, "应该返回用户数据");
+    client.assert(response.body.data.id !== undefined, "应该包含用户ID");
+    client.assert(response.body.message === "用户创建成功", "应该返回成功消息");
+    
+    // 保存用户ID用于后续测试
+    client.global.set("createdUserId", response.body.data.id);
+    console.log("创建的用户ID: " + response.body.data.id);
+  });
+%}
+
+###
+
+### 3. 根据ID获取用户详情
+GET {{apiBase}}/users/{{createdUserId}}
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("获取用户详情", function() {
+    client.assert(response.status === 200, "应该返回200状态码");
+    client.assert(response.body.data !== undefined, "应该有用户数据");
+    client.assert(response.body.data.name === "{{testUserName}}", "用户名应该匹配");
+    client.assert(response.body.data.email === "{{testUserEmail}}", "邮箱应该匹配");
+    console.log("用户详情: " + JSON.stringify(response.body.data));
+  });
+%}
+
+###
+
+### 4. 更新用户信息
+PUT {{apiBase}}/users/{{createdUserId}}
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "张三更新",
+  "email": "zhangsan_updated@example.com"
+}
+
+> {%
+  client.test("更新用户", function() {
+    client.assert(response.status === 200, "更新成功应该返回200状态码");
+    client.assert(response.body.data !== undefined, "应该返回更新后的数据");
+    client.assert(response.body.data.name === "张三更新", "用户名应该已更新");
+    client.assert(response.body.message === "用户更新成功", "应该返回成功消息");
+    console.log("用户更新成功");
+  });
+%}
+
+###
+
+### 5. 验证更新后的用户信息
+GET {{apiBase}}/users/{{createdUserId}}
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("验证用户更新", function() {
+    client.assert(response.status === 200, "应该返回200状态码");
+    client.assert(response.body.data.name === "张三更新", "用户名应该已更新");
+    client.assert(response.body.data.email === "zhangsan_updated@example.com", "邮箱应该已更新");
+    console.log("验证更新成功");
+  });
+%}
+
+###
+
+### 6. 删除用户
+DELETE {{apiBase}}/users/{{createdUserId}}
+
+> {%
+  client.test("删除用户", function() {
+    client.assert(response.status === 200, "删除成功应该返回200状态码");
+    client.assert(response.body.message === "用户删除成功", "应该返回删除成功消息");
+    console.log("用户删除成功");
+  });
+%}
+
+###
+
+### 7. 验证用户已删除
+GET {{apiBase}}/users/{{createdUserId}}
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("验证用户已删除", function() {
+    client.assert(response.status === 404, "删除后应该返回404状态码");
+    client.assert(response.body.error !== undefined, "应该返回错误信息");
+    console.log("确认用户已删除");
+  });
+%}
+
+###
+
+### 8. 测试重复邮箱创建（软删除场景）
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "{{testUserName}}",
+  "email": "{{testUserEmail}}",
+  "password": "{{testUserPassword}}"
+}
+
+> {%
+  client.test("测试重复邮箱创建", function() {
+    client.assert(response.status === 201, "软删除后应该允许重新创建相同邮箱的用户");
+    client.assert(response.body.data !== undefined, "应该返回用户数据");
+    console.log("重复邮箱创建测试通过，用户ID: " + response.body.data.id);
+    
+    // 保存新用户ID用于清理
+    client.global.set("duplicateUserId", response.body.data.id);
+  });
+%}
+
+###
+
+### 9. 清理测试数据
+DELETE {{apiBase}}/users/{{duplicateUserId}}
+
+> {%
+  client.test("清理测试数据", function() {
+    if (response.status === 200 || response.status === 404) {
+      console.log("测试数据清理完成");
+    }
+  });
+%}

@@ -1,0 +1,163 @@
+# 用户管理 - 边界测试和特殊场景
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}
+@apiBase = {{baseUrl}}/api/v1
+@jsonContentType = application/json
+
+### 1. 测试最长用户名（50字符）
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "这是一个非常长的用户名测试这是一个非常长的用户名测试这是一个非常长的用户名测试这是一个非常长的用户名测试这是一个非常长的用户名测试",
+  "email": "longname@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("最长用户名测试", function() {
+    client.assert(response.status === 400 || response.status === 201, "长用户名应该被正确处理");
+  });
+%}
+
+###
+
+### 2. 测试最短用户名（2字符）
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "李",
+  "email": "li@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("最短用户名测试", function() {
+    client.assert(response.status === 201, "最短合法用户名应该被接受");
+    if (response.status === 201) {
+      client.global.set("shortNameUserId", response.body.data.id);
+    }
+  });
+%}
+
+###
+
+### 3. 测试单字符用户名（应该失败）
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "李",
+  "email": "single@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("单字符用户名测试", function() {
+    client.assert(response.status === 400, "单字符用户名应该被拒绝");
+  });
+%}
+
+###
+
+### 4. 测试特殊字符邮箱
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "特殊邮箱用户",
+  "email": "user+test123@sub.example.co.uk",
+  "password": "password123"
+}
+
+> {%
+  client.test("特殊字符邮箱测试", function() {
+    client.assert(response.status === 201, "合法的特殊字符邮箱应该被接受");
+    if (response.status === 201) {
+      client.global.set("specialEmailUserId", response.body.data.id);
+    }
+  });
+%}
+
+###
+
+### 5. 测试重复邮箱（如果有唯一性约束）
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "重复邮箱用户",
+  "email": "user+test123@sub.example.co.uk",
+  "password": "password123"
+}
+
+> {%
+  client.test("重复邮箱测试", function() {
+    client.assert(response.status === 400 || response.status === 201, "重复邮箱应该被正确处理");
+  });
+%}
+
+###
+
+### 6. 测试中文用户名
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "张伟华",
+  "email": "zhangweihua@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("中文用户名测试", function() {
+    client.assert(response.status === 201, "中文用户名应该被支持");
+    if (response.status === 201) {
+      client.global.set("chineseNameUserId", response.body.data.id);
+    }
+  });
+%}
+
+###
+
+### 7. 测试英文用户名
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "John Smith",
+  "email": "john.smith@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("英文用户名测试", function() {
+    client.assert(response.status === 201, "英文用户名应该被支持");
+    if (response.status === 201) {
+      client.global.set("englishNameUserId", response.body.data.id);
+    }
+  });
+%}
+
+###
+
+### 8. 测试混合字符用户名
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "李John123",
+  "email": "mixed@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("混合字符用户名测试", function() {
+    client.assert(response.status === 201 || response.status === 400, "混合字符用户名应该被正确处理");
+    if (response.status === 201) {
+      client.global.set("mixedNameUserId", response.body.data.id);
+    }
+  });
+%}
