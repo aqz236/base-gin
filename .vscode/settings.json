@@ -1,0 +1,28 @@
+{
+    "go.goroot": "/Users/ttx/.goenv/versions/1.24.4",
+    "go.gopath": "/Users/ttx/go/1.24.4",
+    "go.toolsGopath": "/Users/ttx/go/1.24.4",
+    "go.alternateTools": {
+        "go": "/Users/ttx/.goenv/versions/1.24.4/bin/go"
+    },
+    "go.useLanguageServer": true,
+    "go.formatTool": "goimports",
+    "go.lintTool": "golint",
+    "go.vetOnSave": "package",
+    "go.buildOnSave": "package",
+    "go.lintOnSave": "package",
+    "go.coverOnSave": false,
+    "go.useCodeSnippetsOnFunctionSuggest": true,
+    "go.gocodeAutoBuild": false,
+    "go.buildTags": "wireinject",
+    "go.buildFlags": ["-tags=wireinject"],
+    "gopls": {
+        "build.buildFlags": ["-tags=wireinject"],
+        "build.directoryFilters": ["-**/vendor", "-**/node_modules"],
+        "ui.completion.usePlaceholders": true,
+        "ui.diagnostic.analyses": {
+            "fieldalignment": false,
+            "shadow": true
+        }
+    }
+}
