@@ -46,9 +46,9 @@ func LoadConfig() *Config {
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
 			Port:     getEnvAsInt("DB_PORT", 5432),
-			Username: getEnv("DB_USER", "postgres"),
-			Password: getEnv("DB_PASSWORD", "password"),
-			Database: getEnv("DB_NAME", "base_gin"),
+			Username: getEnv("DB_USER", ""),
+			Password: getEnv("DB_PASSWORD", ""),
+			Database: getEnv("DB_NAME", "sqlite"),
 		},
 		Cache: CacheConfig{
 			Host:     getEnv("REDIS_HOST", "localhost"),

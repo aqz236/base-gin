@@ -1,0 +1,65 @@
+# 用户管理 - 验证和错误处理测试
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}
+@apiBase = {{baseUrl}}/api/v1
+@jsonContentType = application/json
+
+### 1. 测试验证错误 - 缺少必填字段
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "email": "test@example.com"
+}
+
+###
+
+### 2. 测试验证错误 - 邮箱格式错误
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "测试用户",
+  "email": "invalid-email-format",
+  "password": "password123"
+}
+
+###
+
+### 3. 测试验证错误 - 密码太短
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "测试用户",
+  "email": "test@example.com",
+  "password": "123"
+}
+
+
+###
+
+### 4. 测试404错误 - 用户不存在
+GET {{apiBase}}/users/999999
+Accept: {{jsonContentType}}
+
+
+###
+
+### 5. 测试无效ID格式
+GET {{apiBase}}/users/invalid-id
+Accept: {{jsonContentType}}
+
+###
+
+### 6. 测试JSON格式错误
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "测试用户",
+  "email": "test@example.com"
+  // 缺少逗号，JSON格式错误
+  "password": "password123"
+}

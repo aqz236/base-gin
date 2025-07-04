@@ -1,0 +1,195 @@
+# 用户管理 - 性能和批量操作测试
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}
+@apiBase = {{baseUrl}}/api/v1
+@jsonContentType = application/json
+
+### 1. 创建批量测试用户 - 用户1
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "批量用户1",
+  "email": "batch1@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("创建批量用户1", function() {
+    client.assert(response.status === 201, "应该成功创建用户");
+    if (response.status === 201) {
+      client.global.set("batchUser1Id", response.body.data.id);
+      console.log("批量用户1 ID: " + response.body.data.id);
+    }
+  });
+%}
+
+
+###
+
+### 2. 创建批量测试用户 - 用户2
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "批量用户2",
+  "email": "batch2@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("创建批量用户2", function() {
+    client.assert(response.status === 201, "应该成功创建用户");
+    if (response.status === 201) {
+      client.global.set("batchUser2Id", response.body.data.id);
+      console.log("批量用户2 ID: " + response.body.data.id);
+    }
+  });
+%}
+
+
+###
+
+### 3. 创建批量测试用户 - 用户3
+POST {{apiBase}}/users
+Content-Type: {{jsonContentType}}
+
+{
+  "name": "批量用户3",
+  "email": "batch3@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.test("创建批量用户3", function() {
+    client.assert(response.status === 201, "应该成功创建用户");
+    if (response.status === 201) {
+      client.global.set("batchUser3Id", response.body.data.id);
+      console.log("批量用户3 ID: " + response.body.data.id);
+    }
+  });
+%}
+
+
+###
+
+### 4. 测试获取所有用户的性能
+GET {{apiBase}}/users
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("获取所有用户性能测试", function() {
+    client.assert(response.status === 200, "应该返回200状态码");
+    client.assert(response.body.data !== undefined, "应该返回用户列表");
+    client.assert(Array.isArray(response.body.data), "数据应该是数组");
+    client.assert(response.body.data.length >= 3, "应该至少有3个用户");
+    
+    // 记录响应时间
+    console.log("获取所有用户响应时间: " + response.responseTime + "ms");
+    client.assert(response.responseTime < 1000, "响应时间应该小于1秒");
+  });
+%}
+
+
+###
+
+### 5. 并发获取用户详情测试 - 获取用户1
+GET {{apiBase}}/users/{{batchUser1Id}}
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("并发获取用户1", function() {
+    client.assert(response.status === 200, "应该返回200状态码");
+    console.log("用户1详情响应时间: " + response.responseTime + "ms");
+  });
+%}
+
+###
+
+### 6. 快速连续请求测试 - 第1次
+GET {{apiBase}}/users
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("快速连续请求1", function() {
+    client.assert(response.status === 200, "连续请求应该都成功");
+    console.log("第1次请求响应时间: " + response.responseTime + "ms");
+  });
+%}
+
+###
+
+### 7. 快速连续请求测试 - 第2次
+GET {{apiBase}}/users
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("快速连续请求2", function() {
+    client.assert(response.status === 200, "连续请求应该都成功");
+    console.log("第2次请求响应时间: " + response.responseTime + "ms");
+  });
+%}
+
+###
+
+### 8. 快速连续请求测试 - 第3次
+GET {{apiBase}}/users
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("快速连续请求3", function() {
+    client.assert(response.status === 200, "连续请求应该都成功");
+    console.log("第3次请求响应时间: " + response.responseTime + "ms");
+  });
+%}
+
+###
+
+### 9. 清理批量测试数据 - 删除用户1
+DELETE {{apiBase}}/users/{{batchUser1Id}}
+
+> {%
+  client.test("清理批量用户1", function() {
+    client.assert(response.status === 200, "删除应该成功");
+    console.log("删除用户1完成");
+  });
+%}
+
+###
+
+### 10. 清理批量测试数据 - 删除用户2
+DELETE {{apiBase}}/users/{{batchUser2Id}}
+
+> {%
+  client.test("清理批量用户2", function() {
+    client.assert(response.status === 200, "删除应该成功");
+    console.log("删除用户2完成");
+  });
+%}
+
+###
+
+### 11. 清理批量测试数据 - 删除用户3
+DELETE {{apiBase}}/users/{{batchUser3Id}}
+
+> {%
+  client.test("清理批量用户3", function() {
+    client.assert(response.status === 200, "删除应该成功");
+    console.log("删除用户3完成");
+  });
+%}
+
+###
+
+### 12. 最终状态检查
+GET {{apiBase}}/users
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("最终状态检查", function() {
+    client.assert(response.status === 200, "应该返回200状态码");
+    console.log("测试完成后用户数量: " + response.body.data.length);
+    console.log("性能测试完成，所有批量用户已清理");
+  });
+%}

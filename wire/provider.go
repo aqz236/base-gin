@@ -18,26 +18,28 @@ import (
 
 // 基础设施层依赖
 var InfraSet = wire.NewSet(
-	configs.LoadConfig,
-	database.NewDB,
-	cache.NewRedisClient,
-	logging.NewLogger,
+	configs.LoadConfig,   // 提供 *configs.Config
+	database.NewDB,       // 需要 *configs.Config，提供 *database.DB
+	cache.NewRedisClient, // 需要 *configs.Config，提供 *cache.RedisClient
+	logging.NewLogger,    // 需要 *configs.Config，提供 *logging.Logger
 )
 
 // 仓储层依赖
 var RepositorySet = wire.NewSet(
-	user_impl.NewUserRepository,
-	wire.Bind(new(repository.UserRepository), new(*user_impl.UserRepo)),
-)
+	user_impl.NewGormUserRepository, // 需要 *database.DB，提供 *user_impl.GormUserRepository
+	wire.Bind(
+		new(repository.UserRepository),
+		new(*user_impl.GormUserRepository)),
+) // 接口绑定
 
 // 领域服务依赖
 var DomainServiceSet = wire.NewSet(
-	domainService.NewUserDomainService,
+	domainService.NewUserDomainService, // 需要 repository.UserRepository，提供 *UserDomainService
 )
 
 // 应用服务依赖
 var ServiceSet = wire.NewSet(
-	service.NewUserService,
+	service.NewUserService, // 需要 repository.UserRepository 和 *UserDomainService
 )
 
 // 验证器依赖

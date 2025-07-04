@@ -1,0 +1,37 @@
+# 引入环境配置
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}
+@apiBase = {{baseUrl}}/api/v1
+@jsonContentType = application/json
+
+### 健康检查 - 验证服务是否正常运行
+GET {{baseUrl}}/health
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("服务健康检查", function() {
+    client.assert(response.status === 200, "服务应该返回200状态码");
+    console.log("健康检查响应:", response.body);
+  });
+%}
+
+### 根路径访问测试
+GET {{baseUrl}}/
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("根路径访问", function() {
+    client.assert(response.status === 200 || response.status === 404, "根路径应该有响应");
+  });
+%}
+
+### API版本检查（如果有版本信息接口）
+GET {{apiBase}}/version
+Accept: {{jsonContentType}}
+
+> {%
+  client.test("API版本检查", function() {
+    client.assert(response.status === 200 || response.status === 404, "版本接口测试");
+  });
+%}

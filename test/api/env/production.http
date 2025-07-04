@@ -1,0 +1,11 @@
+# 生产环境配置
+@hostname = your-domain.com
+@port = 443
+@baseUrl = https://{{hostname}}
+@apiBase = {{baseUrl}}/api/v1
+
+# 通用响应检查
+@jsonContentType = application/json
+
+# 生产环境认证（如果需要）
+@authToken = your-production-auth-token
