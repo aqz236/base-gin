@@ -1,0 +1,79 @@
+{
+  // VS Code Go 开发推荐扩展配置
+  // 这些扩展将自动推荐给打开此项目的开发者
+  "recommendations": [
+    // === Go 核心扩展 ===
+    "golang.go",
+    // Go 官方扩展，提供语法高亮、智能感知、调试、测试、格式化等核心功能
+    // 包含 gopls 语言服务器、dlv 调试器等工具支持
+
+    // === Git 版本控制 ===
+    "eamodio.gitlens",
+    // Git 增强工具，提供代码历史、blame 注释、分支比较等功能
+    // 对于团队协作和代码review非常有用
+    
+    "mhutchie.git-graph",
+    // Git 提交历史可视化图表，方便查看分支合并情况
+    
+    // === 代码编辑增强 ===
+    "andyyaldoo.vscode-json",
+    // JSON 文件语法高亮和验证，处理配置文件时必备
+    
+    "redhat.vscode-yaml",
+    // YAML 文件支持，Docker Compose、CI/CD 配置等场景
+    
+    // === API 开发与测试 ===
+    "anweber.vscode-httpyac",
+    // REST API 客户端，直接在 VS Code 中测试 HTTP 接口
+    // 可以创建 .http 文件来管理API测试用例
+    // 支持JavaScript脚本执行
+
+    // === 数据库工具 ===
+    "cweijan.vscode-redis-client",
+    // 通用数据库连接工具，支持MySQL、PostgreSQL、Redis等
+    
+    // === Docker 容器化 ===
+    "ms-vscode-remote.remote-containers",
+    // Docker 容器开发支持，可以在容器中开发Go应用
+    
+    "ms-azuretools.vscode-docker",
+    // Docker 文件支持，编写和管理 Dockerfile、docker-compose.yml
+    
+    // === 文档与Markdown ===
+    "yzhang.markdown-all-in-one",
+    // Markdown 编写增强，支持目录生成、表格格式化等
+    // 编写项目文档时非常有用
+    
+    "shd101wyy.markdown-preview-enhanced",
+    // 增强的 Markdown 预览功能
+    
+    // === 代码注释与文档生成 ===
+    "aaron-bond.better-comments",
+    // 更好的注释高亮，支持TODO、FIXME等标记
+    
+    // === 项目管理 ===
+    "alefragnani.project-manager",
+    // 项目管理器，快速切换不同项目
+    
+    // === 环境变量管理 ===
+    "mikestead.dotenv",
+    // .env 文件语法高亮和支持
+    
+    // === Makefile 支持 ===
+    "ms-vscode.makefile-tools",
+    // Makefile 语法高亮和任务运行支持
+    // 由于项目使用 Makefile 管理构建任务，这个扩展很有用
+
+    "pkief.material-icon-theme"
+    // 文件图标主题，让文件类型更直观
+  ],
+  
+  // 不推荐的扩展（可能与Go开发冲突或重复）
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-go-legacy",
+    // 旧版Go扩展，已被golang.go替代
+    
+    "lukehoban.go"
+    // 另一个旧版Go扩展
+  ]
+}
