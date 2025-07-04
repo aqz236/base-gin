@@ -117,6 +117,7 @@ jobs:
       run: cd wire && wire
       
     - name: 创建构建目录
+      shell: bash
       run: mkdir -p dist
       
     - name: 构建应用
@@ -124,12 +125,14 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
         CGO_ENABLED: 0
+      shell: bash
       run: |
         go build -ldflags="-s -w -X main.version=${{ github.sha }}" \
           -o dist/base-gin-${{ matrix.name }}${{ matrix.ext }} \
           cmd/main.go
           
     - name: 创建版本信息文件
+      shell: bash
       run: |
         echo "构建信息:" > dist/build-info-${{ matrix.name }}.txt
         echo "版本: ${{ github.sha }}" >> dist/build-info-${{ matrix.name }}.txt
@@ -139,6 +142,7 @@ jobs:
         echo "Go 版本: $(go version)" >> dist/build-info-${{ matrix.name }}.txt
         
     - name: 验证构建结果
+      shell: bash
       run: |
         ls -la dist/
         if [ "${{ matrix.goos }}" = "windows" ]; then
