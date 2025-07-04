@@ -151,3 +151,6 @@ yarn-error.log*
 
 # Copilot files
 docs/copilot/
+
+# database
+data/*.db

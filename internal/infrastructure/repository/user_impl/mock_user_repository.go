@@ -8,15 +8,15 @@ import (
 	"time"
 )
 
-type UserRepo struct {
+type MockUserRepository struct {
 	db     *database.DB
 	users  map[int]*entity.User
 	mutex  sync.RWMutex
 	nextID int
 }
 
-func NewUserRepository(db *database.DB) *UserRepo {
-	repo := &UserRepo{
+func NewMockUserRepository(db *database.DB) *MockUserRepository {
+	repo := &MockUserRepository{
 		db:     db,
 		users:  make(map[int]*entity.User),
 		nextID: 1,
@@ -28,7 +28,7 @@ func NewUserRepository(db *database.DB) *UserRepo {
 	return repo
 }
 
-func (r *UserRepo) initMockData() {
+func (r *MockUserRepository) initMockData() {
 	users := []*entity.User{
 		{
 			ID:        1,
@@ -64,7 +64,7 @@ func (r *UserRepo) initMockData() {
 	}
 }
 
-func (r *UserRepo) FindByID(id int) (*entity.User, error) {
+func (r *MockUserRepository) FindByID(id int) (*entity.User, error) {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 
@@ -78,7 +78,7 @@ func (r *UserRepo) FindByID(id int) (*entity.User, error) {
 	return &userCopy, nil
 }
 
-func (r *UserRepo) FindByEmail(email string) (*entity.User, error) {
+func (r *MockUserRepository) FindByEmail(email string) (*entity.User, error) {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 
@@ -93,7 +93,7 @@ func (r *UserRepo) FindByEmail(email string) (*entity.User, error) {
 	return nil, errors.New("用户不存在")
 }
 
-func (r *UserRepo) FindAll() ([]*entity.User, error) {
+func (r *MockUserRepository) FindAll() ([]*entity.User, error) {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 
@@ -107,7 +107,7 @@ func (r *UserRepo) FindAll() ([]*entity.User, error) {
 	return users, nil
 }
 
-func (r *UserRepo) Save(user *entity.User) error {
+func (r *MockUserRepository) Save(user *entity.User) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -120,7 +120,7 @@ func (r *UserRepo) Save(user *entity.User) error {
 	return nil
 }
 
-func (r *UserRepo) Update(user *entity.User) error {
+func (r *MockUserRepository) Update(user *entity.User) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -133,7 +133,7 @@ func (r *UserRepo) Update(user *entity.User) error {
 	return nil
 }
 
-func (r *UserRepo) Delete(id int) error {
+func (r *MockUserRepository) Delete(id int) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 

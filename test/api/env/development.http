@@ -1,0 +1,13 @@
+# 开发环境配置
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}
+@apiBase = {{baseUrl}}/api/v1
+
+# 通用响应检查
+@jsonContentType = application/json
+
+# 测试数据
+@testUserName = 测试用户
+@testUserEmail = test@example.com
+@testUserPassword = password123

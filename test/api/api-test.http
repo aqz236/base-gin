@@ -1,85 +1,49 @@
-### 基础健康检查
-GET http://localhost:8080/health
+# 此文件已重构为模块化测试套件
+# 
+# 新的测试结构请参考:
+# - README.http              # 主入口和快速检查
+# - common/health.http       # 健康检查
+# - user/simple-crud.http    # 简化CRUD测试
+# - user/crud.http           # 完整CRUD测试
+# - user/validation.http     # 验证测试
+# - user/boundary.http       # 边界测试
+# - user/performance.http    # 性能测试
+# - API_TESTING.md          # 详细文档
 
-### 获取所有用户
-GET http://localhost:8080/api/v1/users
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}
+@apiBase = {{baseUrl}}/api/v1
 
-### 根据ID获取用户
-GET http://localhost:8080/api/v1/users/1
+### 快速健康检查
+GET {{baseUrl}}/health
 
-### 创建新用户
-POST http://localhost:8080/api/v1/users
+### 快速用户API测试
+GET {{apiBase}}/users
+
+### 创建测试用户
+POST {{apiBase}}/users
 Content-Type: application/json
 
 {
-  "name": "张三",
-  "email": "zhangsan@example.com",
-  "phone": "13800138000"
+  "name": "快速测试用户",
+  "email": "3@example.com",
+  "password": "password123"
 }
 
-### 更新用户信息
-PUT http://localhost:8080/api/v1/users/1
-Content-Type: application/json
+> {%
+  client.test("提取用户ID", () => {
+    client.assert(response.status === 201, "创建请求成功");
+    client.assert(response.body.data && response.body.data.id, "响应中包含用户ID");
+    client.global.set("userId", response.body.data.id);
+    client.log("已设置 userId: " + client.global.get("userId"));
+    client.log("完整响应: " + JSON.stringify(response.body));
+  });
+%}
 
-{
-  "name": "张三更新",
-  "email": "zhangsan_updated@example.com",
-  "phone": "13800138001"
-}
+### 删除测试用户
+DELETE {{apiBase}}/users/{{userId}}
 
-### 部分更新用户
-PATCH http://localhost:8080/api/v1/users/1
-Content-Type: application/json
 
-{
-  "name": "张三部分更新"
-}
 
-### 删除用户
-DELETE http://localhost:8080/api/v1/users/1
 
-### 用户列表分页查询
-GET http://localhost:8080/api/v1/users?page=1&limit=10&name=张
-
-### 测试验证错误 - 缺少必填字段
-POST http://localhost:8080/api/v1/users
-Content-Type: application/json
-
-{
-  "email": "invalid-email"
-}
-
-### 测试验证错误 - 邮箱格式错误
-POST http://localhost:8080/api/v1/users
-Content-Type: application/json
-
-{
-  "name": "测试用户",
-  "email": "invalid-email-format"
-}
-
-### 测试404错误 - 用户不存在
-GET http://localhost:8080/api/v1/users/999999
-
-### 环境变量示例（可以在设置中配置）
-# @hostname = localhost
-# @port = 8080
-# @baseUrl = http://{{hostname}}:{{port}}
-
-### 使用环境变量的请求示例
-# GET {{baseUrl}}/api/v1/users
-
-### 带有认证头的请求示例（如果项目后续添加认证）
-# GET http://localhost:8080/api/v1/users
-# Authorization: Bearer your-jwt-token-here
-
-### 文件上传示例（如果项目后续支持文件上传）
-# POST http://localhost:8080/api/v1/users/1/avatar
-# Content-Type: multipart/form-data; boundary=boundary
-#
-# --boundary
-# Content-Disposition: form-data; name="avatar"; filename="avatar.jpg"
-# Content-Type: image/jpeg
-#
-# < ./test-files/avatar.jpg
-# --boundary--
