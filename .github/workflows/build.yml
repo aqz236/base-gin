@@ -20,7 +20,7 @@ jobs:
         go-version: '1.21'
         
     - name: 缓存 Go 模块
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/go-build
@@ -60,6 +60,7 @@ jobs:
   build:
     needs: lint
     strategy:
+      fail-fast: false # 允许某个平台失败时，其他平台继续构建
       matrix:
         include:
           - os: ubuntu-latest
@@ -95,7 +96,7 @@ jobs:
         go-version: '1.21'
         
     - name: 缓存 Go 模块
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/go-build
@@ -148,7 +149,7 @@ jobs:
         
     # 上传构建产物
     - name: 上传构建产物
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: base-gin-${{ matrix.name }}
         path: |
@@ -164,7 +165,7 @@ jobs:
     
     steps:
     - name: 下载所有构建产物
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: artifacts
         
@@ -183,7 +184,7 @@ jobs:
         cat checksums.txt
         
     - name: 上传发布包
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: base-gin-release-${{ github.sha }}
         path: release/
