@@ -47,8 +47,9 @@ func (db *DB) initGORM() error {
 	case "sqlite":
 		// 使用SQLite - 确保数据目录存在
 		dbPath := "data/app.db"
-		if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
-			return fmt.Errorf("failed to create database directory: %v", err)
+		mkdirErr := os.MkdirAll(filepath.Dir(dbPath), 0755)
+		if mkdirErr != nil {
+			return fmt.Errorf("failed to create database directory: %v", mkdirErr)
 		}
 		dialector = sqlite.Open(dbPath)
 	case "postgres":
@@ -59,8 +60,8 @@ func (db *DB) initGORM() error {
 	default:
 		// 默认使用SQLite - 确保数据目录存在
 		dbPath := "data/app.db"
-		if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
-			return fmt.Errorf("failed to create database directory: %v", err)
+		if mkErr := os.MkdirAll(filepath.Dir(dbPath), 0755); mkErr != nil {
+			return fmt.Errorf("failed to create database directory: %v", mkErr)
 		}
 		dialector = sqlite.Open(dbPath)
 	}
