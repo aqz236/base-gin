@@ -52,7 +52,9 @@ jobs:
       run: go vet ./...
       
     - name: 运行测试
-      run: go test -v ./...
+      run: |
+        chmod +x scripts/run-tests.sh
+        ./scripts/run-tests.sh
 
   # 多平台构建
   build:
