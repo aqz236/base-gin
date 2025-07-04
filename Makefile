@@ -1,6 +1,6 @@
 # Base Gin DDD 项目 Makefile
 
-.PHONY: help build run test clean wire fmt vet deps tools check-updates update-deps build-compress build-release
+.PHONY: help build run test clean wire fmt vet deps tools check-updates update-deps build-compress build-release deploy
 
 # 默认目标
 help:
@@ -18,6 +18,7 @@ help:
 	@echo "  check-updates		- 检查依赖更新"
 	@echo "  update-deps  		- 更新所有依赖"
 	@echo "  clean        		- 清理构建文件"
+	@echo "  deploy       		- 生产环境部署准备"
 
 # 安装依赖
 deps:
@@ -52,6 +53,7 @@ update-deps:
 # 生成 Wire 代码
 wire:
 	@echo "生成 Wire 依赖注入代码..."
+	@which wire > /dev/null || (echo "Wire 工具未安装，正在安装..." && go install github.com/google/wire/cmd/wire@latest)
 	cd wire && wire
 
 # 格式化代码
@@ -65,18 +67,18 @@ vet:
 	go vet ./...
 
 # 构建应用
-build: wire fmt vet
+build: deps wire fmt vet
 	@echo "构建应用..."
 	go build -o bin/app cmd/main.go
 
 # 构建发布版本（优化体积）
-build-release: wire fmt vet
+build-release: deps wire fmt vet
 	@echo "构建发布版本（优化体积）..."
 	go build -ldflags="-s -w" -o bin/app cmd/main.go
 	@echo "发布版本构建完成"
 
 # 运行应用
-run: wire
+run: deps wire
 	@echo "运行应用..."
 	go run cmd/main.go
 
@@ -91,8 +93,22 @@ clean:
 	rm -f bin/app
 
 # 构建并使用 UPX 压缩应用
-build-compress: wire fmt vet
+build-compress: deps wire fmt vet
 	@echo "构建并压缩应用..."
 	go build -o bin/app cmd/main.go
 	upx --best --lzma --force-macos bin/app
 	@echo "应用已压缩"
+
+# 生产环境部署准备
+deploy: deps
+	@echo "准备生产环境部署..."
+	@echo "检查 Go 环境..."
+	@go version
+	@echo "安装 Wire 工具..."
+	@which wire > /dev/null || go install github.com/google/wire/cmd/wire@latest
+	@echo "生成 Wire 代码..."
+	@cd wire && wire
+	@echo "构建生产版本..."
+	@go build -ldflags="-s -w" -o bin/app cmd/main.go
+	@echo "部署准备完成！"
+	@echo "可以运行: ./bin/app"
